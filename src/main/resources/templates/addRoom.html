@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>Room Reservations</title>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/ui-darkness/jquery-ui.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/site.css"/>
+
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Room Reservations</a>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="page-header">
+        <h1>Add Room</h1>
+    </div>
+    <form action="#" th:action="@{/add}" th:object="${room}" method="post">
+        <table border="0" cellpadding="10">
+            <tr>
+                <td>
+                <td>Room name</td>
+
+                <td><input type="text" th:field="*{roomName}"/></td>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                <td>Room Number</td>
+                <td><input type="text" th:field="*{roomNUmber}"/></td>
+
+            </tr>
+            <tr>
+                <td>
+                <td>Bed Info</td>
+                <td><input type="text" th:field="*{bedInfo}"/></td>
+
+            </tr>
+            <tr>
+                <td colspan="2"><button type="submit" value="0">Save</button></td>
+            </tr>
+            </tr>
+
+        </table>
+    </form>
+</div>
+<footer class="footer navbar-inverse navbar-fixed-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4"><p class="text-muted">@Copyright 2020 Octavian Vilceanu</p></div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

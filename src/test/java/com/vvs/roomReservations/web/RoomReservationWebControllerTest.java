@@ -84,4 +84,23 @@ public class RoomReservationWebControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("zuzu, mumu")));
     }
+
+    @Test
+    public void getReservationsWithWrongDate() throws Exception{
+        String dateString = "A";
+        Date date = DateUtils.createDateFromDateString(dateString);
+        List<RoomReservation> roomReservations = new ArrayList<>();
+        RoomReservation roomReservation = new RoomReservation();
+        roomReservation.setLastName("zuzu");
+        roomReservation.setFirstName("mumu");
+        roomReservation.setDate(date);
+        roomReservation.setGuestId(1);
+        roomReservation.setRoomId(100);
+        roomReservation.setRoomName("Junit Room");
+        roomReservation.setRoomNumber("J1");
+        roomReservations.add(roomReservation);
+        given(reservationService.getRoomReservationForDate(date)).willReturn(roomReservations);
+        this.mockMvc.perform(get("/reservations?A"))
+                .andExpect(status().isOk());
+    }
 }

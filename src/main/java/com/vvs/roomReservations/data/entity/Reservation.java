@@ -25,12 +25,6 @@ public class Reservation {
     @Column(name="RES_DATE")
     private Date reservationDate;
 
-    public Reservation(long reservationId, long roomId, long guestId, Date reservationDate) {
-        this.reservationId = reservationId;
-        this.roomId = roomId;
-        this.guestId = guestId;
-        this.reservationDate = reservationDate;
-    }
 
     public Reservation(long roomId, long guestId, Date reservationDate) {
         this.roomId = roomId;

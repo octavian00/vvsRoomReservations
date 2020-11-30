@@ -18,14 +18,7 @@ public class ReservationsTest {
     private ReservationRepository reservationRepository;
 
 
-    @Test
-    public void testFindAllReservationsWhenDBisEmpty(){
-        reservationRepository.deleteAll();
-        List<Reservation> reservationListl=new ArrayList<>();
-        Iterable<Reservation> reservations = reservationRepository.findAll();
-        reservations.forEach(reservationListl::add);
-        assertEquals(0,reservationListl.size());
-    }
+
 
     @Test
     public void testAddOneReservation(){

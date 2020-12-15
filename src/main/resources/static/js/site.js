@@ -8,6 +8,10 @@ function setPicker(){
             }
         });
 };
+function setPicker1(){
+    $( "#datepicker" ).datepicker(
+        { dateFormat: 'yy-mm-dd',});
+};
 
 function getRequestParam(p){
     return (window.location.search.match(new RegExp('[?&]' + p + '=([^&]+)')) || [, null])[1];
@@ -41,6 +45,14 @@ function formatDate(input) {
 };
 
 $(document).ready(function(){
-    setPicker();
+
+    if(window.location.pathname ==="/reservations")
+    {
+        setPicker();
+    }
+    else {
+        setPicker1();
+    }
     setInitialDate();
+    console.log(window.location.pathname );
 });

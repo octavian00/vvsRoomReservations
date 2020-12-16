@@ -68,7 +68,7 @@ public class ReservationService {
             emptyInput.printStackTrace();
         }
     }
-    private Reservation convertToReservation(RoomReservation roomReservation) throws EmptyInput, InvalidRoomId, InvalidGuestID {
+    public Reservation convertToReservation(RoomReservation roomReservation) throws EmptyInput, InvalidRoomId, InvalidGuestID {
         if(roomReservation.getRoomId()==null || roomReservation.getGuestId() ==null){
             throw new EmptyInput("RoomID or GuestId are empty");
         }
@@ -101,6 +101,4 @@ public class ReservationService {
         }
         return false;
     }
-
-
 }

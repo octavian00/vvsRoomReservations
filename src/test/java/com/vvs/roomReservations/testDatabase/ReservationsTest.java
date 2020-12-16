@@ -2,7 +2,14 @@ package com.vvs.roomReservations.testDatabase;
 
 import com.vvs.roomReservations.data.entity.Reservation;
 import com.vvs.roomReservations.data.repository.ReservationRepository;
+import com.vvs.roomReservations.exception.EmptyInput;
+import com.vvs.roomReservations.exception.InvalidGuestID;
+import com.vvs.roomReservations.exception.InvalidRoomId;
+import com.vvs.roomReservations.model.dto.RoomReservation;
+import com.vvs.roomReservations.model.service.ReservationService;
+import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,71 +18,98 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class ReservationsTest {
     @Autowired
     private ReservationRepository reservationRepository;
-
-
-
-
-    @Test
-    public void testAddOneReservation(){
-        Date date=new Date();
-        Reservation r =new Reservation(1,7,new java.sql.Date(date.getTime()));
-        reservationRepository.save(r);
-        List<Reservation> reservationListl=new ArrayList<>();
-        Iterable<Reservation> reservations = reservationRepository.findAll();
-        reservations.forEach(reservationListl::add);
-        assertEquals(7,reservationListl.get(reservationListl.size()-1).getGuestId());
-        assertEquals(1,reservationListl.get(reservationListl.size()-1).getRoomId());
-    }
+    @Autowired
+    private ReservationService reservationService;
 
     @Test
-    public void testAddTwoReservations(){
-        Date date=new Date();
-        Reservation r =new Reservation(1,7,new java.sql.Date(date.getTime()));
-        reservationRepository.save(r);
-        Reservation r2 =new Reservation(3,4,new java.sql.Date(date.getTime()));
-        reservationRepository.save(r2);
-        List<Reservation> reservationListl=new ArrayList<>();
-        Iterable<Reservation> reservations = reservationRepository.findAll();
-        reservations.forEach(reservationListl::add);
-        assertEquals(7,reservationListl.get(reservationListl.size()-2).getGuestId());
-        assertEquals(1,reservationListl.get(reservationListl.size()-2).getRoomId());
-        assertEquals(4,reservationListl.get(reservationListl.size()-1).getGuestId());
-        assertEquals(3,reservationListl.get(reservationListl.size()-1).getRoomId());
-    }
-
-    @Test
-    public void testAddOneReservationWhenDBisEmpty(){
+    public void testconvertReservationsWtihNotExistGuestId(){
         reservationRepository.deleteAll();
         Date date=new Date();
-        Reservation r =new Reservation(1,7,new java.sql.Date(date.getTime()));
-        reservationRepository.save(r);
-        List<Reservation> reservationListl=new ArrayList<>();
-        Iterable<Reservation> reservations = reservationRepository.findAll();
-        reservations.forEach(reservationListl::add);
-        assertEquals(7,reservationListl.get(reservationListl.size()-1).getGuestId());
-        assertEquals(1,reservationListl.get(reservationListl.size()-1).getRoomId());
+        RoomReservation r=new RoomReservation();
+        r.setRoomId(1L);
+        r.setGuestId(1001L);
+        r.setDate(date);
+        assertThrows(InvalidGuestID.class, ()->reservationService.convertToReservation(r));
     }
 
     @Test
-    public void testAddTwoReservationsWhenDBisEmpty(){
+    public void testconvertReservationsWtihNotExistRoomId(){
         reservationRepository.deleteAll();
         Date date=new Date();
-        Reservation r =new Reservation(1,7,new java.sql.Date(date.getTime()));
-        reservationRepository.save(r);
-        Reservation r2 =new Reservation(3,4,new java.sql.Date(date.getTime()));
-        reservationRepository.save(r2);
+        RoomReservation r=new RoomReservation();
+        r.setRoomId(101L);
+        r.setGuestId(1L);
+        r.setDate(date);
+        assertThrows(InvalidRoomId.class, ()->reservationService.convertToReservation(r));
+    }
+    @Test
+    public void testconvertReservationsWtihEmptyRoomId(){
+        reservationRepository.deleteAll();
+        Date date=new Date();
+        RoomReservation r=new RoomReservation();
+        r.setGuestId(1L);
+        r.setDate(date);
+        assertThrows(EmptyInput.class, ()->reservationService.convertToReservation(r));
+    }
+
+    @Test
+    public void testconvertReservationsWtihEmptyGuestId(){
+        reservationRepository.deleteAll();
+        Date date=new Date();
+        RoomReservation r=new RoomReservation();
+        r.setRoomId(1L);
+        r.setDate(date);
+        assertThrows(EmptyInput.class, ()->reservationService.convertToReservation(r));
+    }
+
+    @Test
+    public void testconvertReservationsWtihEmptyGuestIdAndRoomId(){
+        reservationRepository.deleteAll();
+        Date date=new Date();
+        RoomReservation r=new RoomReservation();
+        r.setDate(date);
+        assertThrows(EmptyInput.class, ()->reservationService.convertToReservation(r));
+    }
+    @Test
+    public void testaddWithSucces(){
+        reservationRepository.deleteAll();
+        Date date=new Date();
+        RoomReservation r=new RoomReservation();
+        r.setRoomId(1L);
+        r.setGuestId(1L);
+        r.setDate(date);
+        reservationService.addReservation(r);
         List<Reservation> reservationListl=new ArrayList<>();
         Iterable<Reservation> reservations = reservationRepository.findAll();
         reservations.forEach(reservationListl::add);
-        assertEquals(7,reservationListl.get(reservationListl.size()-2).getGuestId());
-        assertEquals(1,reservationListl.get(reservationListl.size()-2).getRoomId());
-        assertEquals(4,reservationListl.get(reservationListl.size()-1).getGuestId());
-        assertEquals(3,reservationListl.get(reservationListl.size()-1).getRoomId());
+        assertEquals(1,reservationListl.size());
+        assertEquals(r.getGuestId(),reservationListl.get(0).getGuestId());
+        assertEquals(r.getRoomId(),reservationListl.get(0).getRoomId());
+    }
+    @Test
+    public void testFailAdd(){
+        reservationRepository.deleteAll();
+        Date date=new Date();
+        RoomReservation r=new RoomReservation();
+        r.setRoomId(1L);
+        r.setGuestId(100001L);
+        r.setDate(date);
+        reservationService.addReservation(r);
+        List<Reservation> reservationListl=new ArrayList<>();
+        Iterable<Reservation> reservations = reservationRepository.findAll();
+        reservations.forEach(reservationListl::add);
+        assertEquals(0,reservationListl.size());
+    }
+
+    @Test
+    public void getReservationsSucces(){
+        assertEquals(28,reservationService.getRoomReservationForDate(new Date()).size());
     }
 
 }

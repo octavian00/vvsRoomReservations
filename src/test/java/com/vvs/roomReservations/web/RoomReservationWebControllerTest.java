@@ -74,8 +74,8 @@ public class RoomReservationWebControllerTest {
         roomReservation.setLastName("zuzu");
         roomReservation.setFirstName("mumu");
         roomReservation.setDate(date);
-        roomReservation.setGuestId(new Long(1));
-        roomReservation.setRoomId(new Long(100));
+        roomReservation.setGuestId(1L);
+        roomReservation.setRoomId(100L);
         roomReservation.setRoomName("Junit Room");
         roomReservation.setRoomNumber("J1");
         roomReservations.add(roomReservation);
@@ -94,8 +94,8 @@ public class RoomReservationWebControllerTest {
         roomReservation.setLastName("zuzu");
         roomReservation.setFirstName("mumu");
         roomReservation.setDate(date);
-        roomReservation.setGuestId(new Long(1));
-        roomReservation.setRoomId(new Long(100));
+        roomReservation.setGuestId(1L);
+        roomReservation.setRoomId(100L);
         roomReservation.setRoomName("Junit Room");
         roomReservation.setRoomNumber("J1");
         roomReservations.add(roomReservation);

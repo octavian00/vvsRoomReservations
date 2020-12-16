@@ -1,5 +1,7 @@
 package com.vvs.roomReservations.selenium;
 
+import com.vvs.roomReservations.data.entity.Reservation;
+import com.vvs.roomReservations.data.repository.ReservationRepository;
 import com.vvs.roomReservations.data.repository.RoomRepository;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
@@ -11,7 +13,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
@@ -26,6 +27,7 @@ public class SeleniumTests {
     @LocalServerPort
     private int localPort;
     private String serverUrl;
+
 
     private WebDriver webDriver;
     @BeforeAll
@@ -80,7 +82,7 @@ public class SeleniumTests {
         wait.until(elementToBeClickable(go_back));
         webDriver.findElement(go_back).click();
         Thread.sleep(1000);
-        assertEquals(serverUrl,webDriver.getCurrentUrl());
+        assertEquals(serverUrl+"/",webDriver.getCurrentUrl());
     }
 
     @Test
@@ -95,7 +97,7 @@ public class SeleniumTests {
         wait.until(elementToBeClickable(go_back));
         webDriver.findElement(go_back).click();
         Thread.sleep(2000);
-        assertEquals(serverUrl,webDriver.getCurrentUrl());
+        assertEquals(serverUrl+"/",webDriver.getCurrentUrl());
     }
 
     @Test
@@ -138,6 +140,9 @@ public class SeleniumTests {
 
     @Test
     public void testWhenAdReservation() throws InterruptedException {
+        String personName="Adams, Roy";
+        String getURl=serverUrl+"/reservations";
+        String finalUrl=serverUrl+"/";
         serverUrl=serverUrl+"/addReservation";
         WebDriverWait wait = new WebDriverWait(webDriver,30,1000);
         webDriver.get(serverUrl);
@@ -146,6 +151,55 @@ public class SeleniumTests {
         String guestID="1";
         By rroomID=By.id("roomID");
         wait.until(presenceOfElementLocated(rroomID));
+        webDriver.findElement(rroomID).clear();
+        webDriver.findElement(rroomID).sendKeys(roomID);
+
+        Thread.sleep(2000);
+
+        By gguestID=By.id("guestId");
+        wait.until(presenceOfElementLocated(gguestID));
+        webDriver.findElement(gguestID).clear();
+        webDriver.findElement(gguestID).sendKeys(guestID);
+
+        Thread.sleep(2000);
+
+        By saveBtn=By.id("btn_save");
+        wait.until(presenceOfElementLocated(saveBtn));
+        webDriver.findElement(saveBtn).click();
+
+        Thread.sleep(1000);
+        assertEquals(finalUrl,webDriver.getCurrentUrl());
+        webDriver.get(getURl);
+
+        Thread.sleep(1000);
+
+        WebElement personS = webDriver.findElement(By.xpath("//body/div[@class='container']/table/tbody/tr[2]/td[3]"));
+
+        assertEquals(personName,personS.getText());
+    }
+
+    @Test
+    public void testWhenInputsAreEmpty() throws InterruptedException {
+        String reservationUrl=serverUrl+"/addReservation";
+        WebDriverWait wait = new WebDriverWait(webDriver,30,1000);
+        webDriver.get(reservationUrl);
+        Thread.sleep(2000);
+        By rroomID=By.id("roomID");
+        wait.until(presenceOfElementLocated(rroomID));
+        webDriver.findElement(rroomID).clear();
+        webDriver.findElement(rroomID).sendKeys("");
+
+        By guestId=By.id("guestId");
+        wait.until(presenceOfElementLocated(guestId));
+        webDriver.findElement(guestId).clear();
+        webDriver.findElement(guestId).sendKeys("");
+
+        By saveBtn=By.id("btn_save");
+        wait.until(presenceOfElementLocated(saveBtn));
+        webDriver.findElement(saveBtn).click();
+
+        Thread.sleep(1000);
+        assertEquals(serverUrl+"/",webDriver.getCurrentUrl());
 
     }
 }

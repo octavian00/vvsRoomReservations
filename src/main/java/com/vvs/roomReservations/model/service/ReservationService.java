@@ -1,5 +1,8 @@
 package com.vvs.roomReservations.model.service;
 
+import com.vvs.roomReservations.exception.EmptyInput;
+import com.vvs.roomReservations.exception.InvalidGuestID;
+import com.vvs.roomReservations.exception.InvalidRoomId;
 import com.vvs.roomReservations.model.dto.RoomReservation;
 import com.vvs.roomReservations.data.entity.Guest;
 import com.vvs.roomReservations.data.entity.Reservation;
@@ -10,7 +13,9 @@ import com.vvs.roomReservations.data.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ReservationService {
@@ -56,12 +61,46 @@ public class ReservationService {
         return  roomReservations;
     }
 
-    public void addReservation(RoomReservation roomReservation){
-        this.reservationRepository.save(convertToReservation(roomReservation));
+    public void addReservation(RoomReservation roomReservation) {
+        try {
+            this.reservationRepository.save(convertToReservation(roomReservation));
+        }catch (EmptyInput | InvalidRoomId | InvalidGuestID emptyInput){
+            emptyInput.printStackTrace();
+        }
     }
-    private Reservation convertToReservation(RoomReservation roomReservation){
+    private Reservation convertToReservation(RoomReservation roomReservation) throws EmptyInput, InvalidRoomId, InvalidGuestID {
+        if(roomReservation.getRoomId()==null || roomReservation.getGuestId() ==null){
+            throw new EmptyInput("RoomID or GuestId are empty");
+        }
+        if(!isPresentRoom(roomReservation.getRoomId())){
+            throw new InvalidRoomId("Invalid Room ID");
+        }
+        if(!isPresentGuest(roomReservation.getGuestId())){
+            throw  new InvalidGuestID("Invalid GUEST ID");
+        }
         Date date = new Date();
         return new Reservation(roomReservation.getRoomId(),roomReservation.getGuestId(), new java.sql.Date(date.getTime()));
     }
+    private boolean isPresentRoom(Long roomId){
+        Iterable<Room> reservations = roomRepository.findAll();
+        List<Room> roomList =new ArrayList<>();
+        reservations.forEach(roomList::add);
+        Optional<Room> room=roomList.stream().filter(r->r.getRoomId()==roomId).findAny();
+        if(room.isPresent()){
+            return true;
+        }
+        return false;
+    }
+    private boolean isPresentGuest(Long guestId){
+        Iterable<Guest> reservations = guestRepository.findAll();
+        List<Guest> roomList =new ArrayList<>();
+        reservations.forEach(roomList::add);
+        Optional<Guest> room=roomList.stream().filter(r->r.getGuestId()==guestId).findAny();
+        if(room.isPresent()){
+            return true;
+        }
+        return false;
+    }
+
 
 }

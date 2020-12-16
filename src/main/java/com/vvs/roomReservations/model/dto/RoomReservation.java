@@ -8,8 +8,8 @@ import java.util.Date;
 @Data
 @Accessors
 public class RoomReservation {
-    private long roomId;
-    private long guestId;
+    private Long roomId;
+    private Long guestId;
     private String roomName;
     private String roomNumber;
     private String firstName;
